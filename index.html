@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Test</title>
+</head>
+<body>
+  <iframe width="750" height="500" id="iframeform" src="https://pffitness.zenotibeta.com/Appointment/AppointmentCustomDataV2.aspx?InvoiceItemId=F653BBB5-FC81-4C3D-B8E4-7F725C1B57DB&UserId=6309EDF0-7F7B-4E8F-98F8-A5DBD6DB8DAB&FormType=15&FormId=A0FD070F-9D37-42FD-A463-5E3D443B3153&NoHeader=1&Source=0&LangCode=&AWToken=AN%3apffitness%7c%24ARD%23dbGe8d6YR4bZ3ovGMg5%2bPrI8EAb4p3kc0l8ReJ7yMe40dowteyW3oi5aDTOeM8NzFBQzJ2fwqUT8ZZoC%2bwUEkG03uig0ONha5%2bahrdcdvPNg3rYMBy4Y3LlSr59TeHVdHBk4Rrrh0CgJp4NAjjMT6fSdtJjbFAvhQPhA7QRpuCBEi%2byVe%2bbKs98T95cXPeovIPQQ%2fqrhW3dIHU%2fdqPc4NhnyS29%2fRQOo8hw4BSRjkZ18sw5Dk3j76SSny3PQcpS2DlokO14E%2bQFtG19%2bg8LMYOfFmJdWAY6lW4DHL441bDBfU0GMfVUrSMOD"></iframe>
+  <button id="submitBtn">Save Form</button>
+
+  <script>
+    window.addEventListener('message', (event) => {
+      // Ensure the message is from the expected origin
+      if (event.origin === 'https://pffitness.zenotibeta.com') {
+        let data = JSON.parse(event.data);
+
+        if (data && data.formSaved) {
+          console.log("Form has been saved successfully!");
+        }
+      }
+    }, false);
+
+    const submitBtn = document.getElementById('submitBtn');
+
+    submitBtn.addEventListener('click', saveForm);
+
+    function saveForm() {
+      let iframeWin, json = {
+          'formSaved': true
+      };
+      iframeWin = document.getElementById('iframeform');
+
+      // Correct target origin for the postMessage
+      const iframeOrigin = 'http://localhost:8080';
+      iframeWin.contentWindow.postMessage(JSON.stringify(json), iframeOrigin);
+
+      // Add event listener only once, preferably outside of the function to avoid adding multiple listeners
+      window.addEventListener('message', (event) => {
+        // Verify the event's origin
+        console.log(`${event.origin} !== ${iframeOrigin}? ${event.origin !== iframeOrigin} `)
+        if (event.origin !== iframeOrigin) {
+          return; // Ignore messages from unexpected origins
+        }
+        
+        let data = event.data
+        
+        console.log(data)
+
+        console.log('done')
+      }, false);
+    }
+  </script>
+</body>
+</html>
